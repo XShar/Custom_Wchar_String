@@ -74,8 +74,11 @@
  Пример:
  
  //Тест конвертации числа в строку 
+ 
  uint32_t npos = 55;
+ 
  Wstring Position_str = L"\0"; 
+ 
  Position_str = Position_str.numeric_to_wstr(npos);
  
  Описание проекта:
