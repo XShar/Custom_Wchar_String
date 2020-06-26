@@ -23,7 +23,7 @@ Wstring::Wstring(const Wstring& s) {
 }
 
 Wstring::~Wstring() {
-    delete[] data;
+    hFree(data);
 }
 
 const Wstring& Wstring::operator= (const wchar_t* data) {
@@ -99,7 +99,7 @@ void Wstring::Resize(const size_t n) {
 
     if (n == 0) {
         if (data != nullptr)
-            delete data;
+            hFree(data);
         data = nullptr;
         length = 0;
     }
@@ -107,7 +107,7 @@ void Wstring::Resize(const size_t n) {
         if (!IsEmpty()) {
             wchar_t* temp = (wchar_t*)hAlloc(sizeof(wchar_t)*(n + 3));
             strCpyW(temp, data);
-            delete data;
+            hFree(data);
             data = temp;
         }
         else {
