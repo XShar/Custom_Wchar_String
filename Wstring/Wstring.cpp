@@ -12,13 +12,13 @@ Wstring::Wstring() {
 
 Wstring::Wstring(const wchar_t* data) {
     length = (size_t) strLenW(data);
-    this->data = (wchar_t*)hAlloc(sizeof(wchar_t)*this->length + 1);
+    this->data = (wchar_t*)hAlloc(sizeof(wchar_t)*this->length + 2);
     strCpyW(this->data, data);
 }
 
 Wstring::Wstring(const Wstring& s) {
     length = s.length;
-    this->data = (wchar_t*)hAlloc(sizeof(wchar_t)*length + 1);
+    this->data = (wchar_t*)hAlloc(sizeof(wchar_t)*length + 2);
     strCpyW(this->data, s.data);
 }
 
@@ -28,14 +28,14 @@ Wstring::~Wstring() {
 
 const Wstring& Wstring::operator= (const wchar_t* data) {
     length = (size_t) strLenW(data);
-    this->data = (wchar_t*)hAlloc(sizeof(wchar_t)*length + 1);
+    this->data = (wchar_t*)hAlloc(sizeof(wchar_t)*length + 2);
     strCpyW(this->data, data);
     return *this;
 }
 
 const Wstring& Wstring::operator= (const Wstring& s) {
     length = s.length;
-    this->data = (wchar_t*)hAlloc(sizeof(wchar_t)*length + 1);
+    this->data = (wchar_t*)hAlloc(sizeof(wchar_t)*length + 2);
     strCpyW(this->data, s.data);
     return *this;
 }
@@ -43,7 +43,7 @@ const Wstring& Wstring::operator= (const Wstring& s) {
 Wstring Wstring::operator+ (const Wstring& s) {
     Wstring temp;
     temp.length = length + s.length;
-    temp.data = (wchar_t*)hAlloc(sizeof(wchar_t)*temp.length + 1);
+    temp.data = (wchar_t*)hAlloc(sizeof(wchar_t)*temp.length + 2);
     strCpyW(temp.data, data);
     strCatW(temp.data, s.data);
     return temp;
@@ -52,7 +52,7 @@ Wstring Wstring::operator+ (const Wstring& s) {
 Wstring Wstring::operator+ (const wchar_t* d) {
     Wstring temp;
     temp.length = length + (int)strLenW(d);
-    temp.data = (wchar_t*)hAlloc(sizeof(wchar_t)*temp.length + 1);
+    temp.data = (wchar_t*)hAlloc(sizeof(wchar_t)*temp.length + 2);
     strCpyW(temp.data, data);
     strCatW(temp.data, d);
     return temp;
