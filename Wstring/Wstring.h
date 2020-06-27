@@ -37,6 +37,7 @@ public:
     void Clear();
     bool IsEmpty() const;
 
+    size_t lenght() const;
     size_t size() const;
 
     const wchar_t* c_wstr() const;

@@ -202,9 +202,14 @@ const wchar_t* Wstring::c_wstr() const {
     return data;
 }
 
-size_t Wstring::size() const {
-    return length;
+size_t Wstring::lenght() const {
+    return (length - 1);
 }
+
+size_t Wstring::size() const {
+    return (length*(sizeof(wchar_t)));
+}
+
 
 size_t Wstring::Find(const Wstring& s, size_t pos) {
     return Find(s.data, pos);
