@@ -136,7 +136,7 @@
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <AssemblyDebug>false</AssemblyDebug>
       <EntryPointSymbol>main</EntryPointSymbol>
-      <AdditionalDependencies>kernel32.lib;user32.lib;ucrtd.lib</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
