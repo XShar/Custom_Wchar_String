@@ -1,5 +1,6 @@
 #include "Wstring.h"
 #include "Helpers.h"
+#include "CustomAlloc.h"
 
 #include <Windows.h>
 
@@ -11,50 +12,70 @@ Wstring::Wstring() {
 }
 
 Wstring::Wstring(const wchar_t* data) {
-    length = (size_t) strLenW(data);
-    this->data = (wchar_t*)hAlloc(sizeof(wchar_t)*this->length + 2);
-    strCpyW(this->data, data);
+    length = strLenW(data);
+    this->data = (wchar_t*)_malloc(sizeof(wchar_t)*this->length + 2);
+    if ((this->data != nullptr) && (data != nullptr)) {
+        strCpyW(this->data, data);
+    }
 }
 
 Wstring::Wstring(const Wstring& s) {
     length = s.length;
-    this->data = (wchar_t*)hAlloc(sizeof(wchar_t)*length + 2);
-    strCpyW(this->data, s.data);
+    this->data = (wchar_t*)_malloc(sizeof(wchar_t)*length + 2);
+    if ((this->data != nullptr) && (s.data != nullptr)) {
+        strCpyW(this->data, s.data);
+    }
 }
 
 Wstring::~Wstring() {
-    hFree(data);
+    _free(data);
 }
 
 const Wstring& Wstring::operator= (const wchar_t* data) {
-    length = (size_t) strLenW(data);
-    this->data = (wchar_t*)hAlloc(sizeof(wchar_t)*length + 2);
-    strCpyW(this->data, data);
+    length = strLenW(data);
+    if (this->data != nullptr) {
+        _free(this->data);
+        this->data = nullptr;
+    }
+    this->data = (wchar_t*)_malloc(sizeof(wchar_t)*length + 2);
+    if ((this->data != nullptr) && (data != nullptr)) {
+        strCpyW(this->data, data);
+    }
     return *this;
 }
 
 const Wstring& Wstring::operator= (const Wstring& s) {
     length = s.length;
-    this->data = (wchar_t*)hAlloc(sizeof(wchar_t)*length + 2);
-    strCpyW(this->data, s.data);
+    if (this->data != nullptr) {
+        _free(this->data);
+        this->data = nullptr;
+    }
+    this->data = (wchar_t*)_malloc(sizeof(wchar_t)*length + 2);
+    if ((this->data != nullptr) && (s.data != nullptr)) {
+        strCpyW(this->data, s.data);
+    }
     return *this;
 }
 
 Wstring Wstring::operator+ (const Wstring& s) {
     Wstring temp;
     temp.length = length + s.length;
-    temp.data = (wchar_t*)hAlloc(sizeof(wchar_t)*temp.length + 2);
-    strCpyW(temp.data, data);
-    strCatW(temp.data, s.data);
+    temp.data = (wchar_t*)_malloc(sizeof(wchar_t)*temp.length + 2);
+    if ((temp.data != nullptr) && (data != nullptr) && (s.data != nullptr)) {
+        strCpyW(temp.data, data);
+        strCatW(temp.data, s.data);
+    }
     return temp;
 }
 
 Wstring Wstring::operator+ (const wchar_t* d) {
     Wstring temp;
     temp.length = length + (int)strLenW(d);
-    temp.data = (wchar_t*)hAlloc(sizeof(wchar_t)*temp.length + 2);
-    strCpyW(temp.data, data);
-    strCatW(temp.data, d);
+    temp.data = (wchar_t*)_malloc(sizeof(wchar_t)*temp.length + 2);
+    if ((temp.data != nullptr) && (data != nullptr) && (d != nullptr)) {
+        strCpyW(temp.data, data);
+        strCatW(temp.data, d);
+    }
     return temp;
 }
 
@@ -90,7 +111,7 @@ void Wstring::PushBack(const Wstring& s) {
 }
 
 void Wstring::Clear() {
-    hFree(data);
+    _free(data);
     data = nullptr;
     length = 0;
 }
@@ -99,20 +120,24 @@ void Wstring::Resize(const size_t n) {
 
     if (n == 0) {
         if (data != nullptr)
-            hFree(data);
+            _free(data);
         data = nullptr;
         length = 0;
     }
     else if (n > length) {
         if (!IsEmpty()) {
-            wchar_t* temp = (wchar_t*)hAlloc(sizeof(wchar_t)*(n + 3));
-            strCpyW(temp, data);
-            hFree(data);
+            wchar_t* temp = (wchar_t*)_malloc(sizeof(wchar_t)*(n + 3));
+            if (temp != nullptr) {
+                strCpyW(temp, data);
+                _free(data);
+            }
             data = temp;
         }
         else {
-            data = (wchar_t*)hAlloc(sizeof(wchar_t)*(n + 3));
-            data[n] = '\0';
+            data = (wchar_t*)_malloc(sizeof(wchar_t)*(n + 3));
+            if (data != nullptr) {
+                data[n] = L'\0';
+            }
         }
         length = n;
 
@@ -179,13 +204,6 @@ const wchar_t* Wstring::c_wstr() const {
     return data;
 }
 
-const char* Wstring::c_str() {
-    size_t size_str_to_convert = length * sizeof(wchar_t);
-    char* str_to_convert = (char*)hAlloc(size_str_to_convert);
-    WideCharToMultiByte (CP_UTF8, 0, data, -1, str_to_convert, length, nullptr, nullptr);
-    return str_to_convert;
-}
-
 size_t Wstring::size() const {
     return length;
 }
@@ -230,7 +248,7 @@ void Wstring::split(wchar_t* delim, Wstring* array_strings, size_t size_array_st
     *count_splited = count;
 }
 
-Wstring Wstring::numeric_to_wstr(unsigned long num) {
+Wstring Wstring::NumericToWstr(unsigned long num) {
     wchar_t converted_num[1024];
     return Wstring(itoaW(num, converted_num));
 }

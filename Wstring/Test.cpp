@@ -5,10 +5,7 @@
 Тесты кастомного класса стринг wchar_t
 */
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+int main()
 {
 
    //Создание массива строк 
@@ -82,16 +79,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
    //Тест конвертации числа в строку
    Wstring Position_str = L"\0"; 
-   Position_str = Position_str.numeric_to_wstr(npos);
+   Position_str = Position_str.NumericToWstr(npos);
 
    Wstring Str_to_send = L"Позициая искомой строки:";
    Str_to_send = Str_to_send + Position_str;
    
    MessageBoxW(0, Str_to_send.c_wstr(), L"OK", MB_OK);
-
-   //Тест конвертации wchar_t в char
-   Wstring Str_to_convert = L"Test str to convert char";
-   MessageBoxA(0, (char*)Str_to_convert.c_str(), "OK", MB_OK);
 
    //Проверка добовления символов в строку
    Wstring Str_test_array = L"\0";

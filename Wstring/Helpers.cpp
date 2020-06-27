@@ -100,7 +100,7 @@ size_t strspnW(const wchar_t* s, const wchar_t* c)
     return s - a;
 }
 
-void* my_memset(void* buf, char z, size_t bytes)
+static inline void* memset(void* buf, char z, size_t bytes)
 {
     if (buf)
     {
@@ -118,7 +118,7 @@ size_t strcspnW(const wchar_t* s, const wchar_t* c)
 
     if (!c[0] || !c[1]) return strchrnulW(s, *c) - a;
 
-    my_memset(byteset, 0, sizeof byteset);
+    memset(byteset, 0, sizeof byteset);
     for (; *c && BITOP(byteset, *(wchar_t*)c, |=); c++);
     for (; *s && !BITOP(byteset, *(wchar_t*)s, &); s++);
     return s - a;
@@ -161,14 +161,4 @@ wchar_t* itoaW(unsigned long i, wchar_t b[])
         i = i / 10;
     } while (i);
     return b;
-}
-
-void* hAlloc(size_t size)
-{
-    return HeapAlloc(GetProcessHeap(), 0, size);
-}
-
-void hFree(void* mem)
-{
-    HeapFree(GetProcessHeap(), 0, mem);
 }
