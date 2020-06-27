@@ -1,4 +1,4 @@
-#include "Wstring.h"
+﻿#include "Wstring.h"
 #include "Helpers.h"
 #include "CustomAlloc.h"
 
@@ -7,6 +7,7 @@ static const size_t npos = (-1);
 Wstring::Wstring() {
     length = 0;
     data = nullptr;
+    tmp_str = nullptr;
 }
 
 Wstring::Wstring(const wchar_t* data) {
@@ -239,14 +240,26 @@ size_t Wstring::Find(const wchar_t* data, size_t pos) {
 }
 
 void Wstring::split(wchar_t* delim, Wstring* array_strings, size_t size_array_strings, size_t *count_splited) {
+    
     size_t count = 0;
-    wchar_t* p = strTokW(this->data, delim);
-    while (p)
-    {
-        if (count >= size_array_strings) break;
-        array_strings[count] = p;
-        count++;
-        p = strTokW(0, delim);
+
+    //Т.к. strtok меняет исходную строку, то будем работать с временной строкой
+    if (tmp_str != nullptr) {
+        _free(tmp_str);
+        tmp_str = nullptr;
+    }
+
+    tmp_str = (wchar_t*)_malloc(sizeof(wchar_t)*length + sizeof(wchar_t));
+    if ((tmp_str != nullptr) && (this->data != nullptr)) {
+        strCpyW(tmp_str, this->data);
+        wchar_t* p = strTokW(tmp_str, delim);
+        while (p)
+        {
+            if (count >= size_array_strings) break;
+            array_strings[count] = p;
+            count++;
+            p = strTokW(0, delim);
+        }
     }
     *count_splited = count;
 }

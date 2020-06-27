@@ -4,6 +4,7 @@ class Wstring {
 
 private:
     wchar_t* data;
+    wchar_t* tmp_str;
     size_t length;
 
 public:
