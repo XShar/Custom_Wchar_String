@@ -1,10 +1,10 @@
-﻿#include <stdint.h>
-#include "CustomAlloc.h"
+﻿#include "CustomAlloc.h"
 
 #define HEAP_SIZE 2*1024*1024
-
 #define BLOCK_SIZE 0x1000
-#define BLOCK_SIZE_MASK 0xFFFFF000
+
+typedef unsigned char  uint8_t;
+typedef unsigned int   uintptr_t;
 
 /*
 В данном решении выделяется статически 2Мб. памяти и работа идет с этим буфером.
@@ -23,7 +23,7 @@ typedef struct segment {
 static segment_t* segments = nullptr;
 static segment_t* old_free_segment = nullptr;
 
-void heap_init(void* buf, size_t size)
+void HeapInit(void* buf, size_t size)
 {
 	segments = (segment_t*)buf;
 	segments->is_free = 1;
@@ -35,7 +35,7 @@ void heap_init(void* buf, size_t size)
 
 // находит сегмент свободной памяти, но никаких действий над ним не производит
 // поиск производится от переданного элемента и до конца списка
-static segment_t* search_free(segment_t* s, int size)
+static segment_t* SearchFree(segment_t* s, int size)
 {
 	while (s) {
 		if (s->is_free && s->size >= size) return s;
@@ -45,7 +45,7 @@ static segment_t* search_free(segment_t* s, int size)
 }
 
 // переводит размер в байтах в количество блоков
-static int get_num_block(size_t size)
+static int GetNumBlock(size_t size)
 {
 	if (size % BLOCK_SIZE) size += BLOCK_SIZE;
 	return size / BLOCK_SIZE;
@@ -53,7 +53,7 @@ static int get_num_block(size_t size)
 
 // отрезает от указанного сегмента, указанный размер
 // возвращает указатель на новый сегмент памяти
-static segment_t* cut_segment(segment_t* s, int size)
+static segment_t* CutSegment(segment_t* s, int size)
 {
 	uintptr_t addr = (uintptr_t)s;
 	addr += (s->size - size) * BLOCK_SIZE;
@@ -70,7 +70,7 @@ static segment_t* cut_segment(segment_t* s, int size)
 
 // объединяет два соседних сегмента в один(первый поглощает второй)
 // возвращает указатель на новый сегмент
-static segment_t* merge_segment(segment_t* s, segment_t* old)
+static segment_t* MergeSegment(segment_t* s, segment_t* old)
 {
 	if (old_free_segment == old) old_free_segment = s;
 	s->size += old->size;
@@ -79,12 +79,12 @@ static segment_t* merge_segment(segment_t* s, segment_t* old)
 	return s;
 }
 
-static void* segment_to_ptr(segment_t* s)
+static void* SegmentToPtr(segment_t* s)
 {
 	return (char*)s + sizeof(segment_t);
 }
 
-static segment_t* ptr_to_segment(void* ptr)
+static segment_t* PtrToSegment(void* ptr)
 {
 	return (segment_t*)((char*)ptr - sizeof(segment_t));
 }
@@ -101,17 +101,17 @@ static void* _memcpy(void* dest, const void* src, size_t bytes)
 }
 
 
-// возвращает 0 если нету памяти
+// возвращает nullptr если нету памяти
 void* _malloc(size_t size)
 {
 	
 	if (segments == nullptr) {
-		heap_init(memory, HEAP_SIZE);
+		HeapInit(memory, HEAP_SIZE);
 	};
 
-	int s = get_num_block(size + sizeof(segment_t));
-	segment_t* it = search_free(old_free_segment, s);
-	if (!it) it = search_free(segments, s);
+	int s = GetNumBlock(size + sizeof(segment_t));
+	segment_t* it = SearchFree(old_free_segment, s);
+	if (!it) it = SearchFree(segments, s);
 	if (!it) {
 		return nullptr;
 	}
@@ -119,28 +119,28 @@ void* _malloc(size_t size)
 	it->is_free = 0; // бронируем участок памяти
 
 	// отрежем лишнюю память(на конце может остаться маленький кусочек памяти)
-	if (it->size > s + get_num_block(sizeof(segment_t))) {
-		segment_t* n = cut_segment(it, it->size - s);
+	if (it->size > s + GetNumBlock(sizeof(segment_t))) {
+		segment_t* n = CutSegment(it, it->size - s);
 		n->is_free = 1;
 		old_free_segment = n;
 	}
-	return segment_to_ptr(it);
+	return SegmentToPtr(it);
 }
 
 void _free(void* ptr)
 {
 	if (!ptr) return;
-	segment_t* s = ptr_to_segment(ptr);
+	segment_t* s = PtrToSegment(ptr);
 	s->is_free = 1;
 
-	if (s->next && s->next->is_free) merge_segment(s, s->next);
-	if (s->prev && s->prev->is_free) merge_segment(s->prev, s);
+	if (s->next && s->next->is_free) MergeSegment(s, s->next);
+	if (s->prev && s->prev->is_free) MergeSegment(s->prev, s);
 }
 
 void* _realloc(void* ptr, size_t size)
 {
 	if (segments == nullptr) {
-		heap_init(memory, HEAP_SIZE);
+		HeapInit(memory, HEAP_SIZE);
 	};
 
 	if (!size) {
@@ -148,15 +148,15 @@ void* _realloc(void* ptr, size_t size)
 		return nullptr;
 	}
 
-	segment_t* s = ptr_to_segment(ptr);
-	int b = get_num_block(size + sizeof(segment_t));
+	segment_t* s = PtrToSegment(ptr);
+	int b = GetNumBlock(size + sizeof(segment_t));
 	if (s->size == b) return ptr; // ничего делать не надо, размер не изменился
 	else if (s->size > b) return ptr; // FIXME: надо бы освободить часть памяти
 	else { // if (s->size < b)
 		if (s->next && s->next->is_free && s->size + s->next->size >= b) {
-			merge_segment(s, s->next);
-			if (s->size > b + get_num_block(sizeof(segment_t))) {
-				segment_t* n = cut_segment(s, s->size - b);
+			MergeSegment(s, s->next);
+			if (s->size > b + GetNumBlock(sizeof(segment_t))) {
+				segment_t* n = CutSegment(s, s->size - b);
 				n->is_free = 1;
 			}
 			return ptr;

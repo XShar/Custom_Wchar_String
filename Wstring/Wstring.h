@@ -1,6 +1,4 @@
 #pragma once
-#include <string.h>
-#include "resource.h"
 
 class Wstring {
 

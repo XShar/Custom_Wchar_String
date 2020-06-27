@@ -1,5 +1,5 @@
 #pragma once
-#include <Windows.h>
+
 wchar_t* itoaW(unsigned long i, wchar_t b[]);
 wchar_t* strTokW(wchar_t* s, const wchar_t* sep);
 size_t strcspnW(const wchar_t* s, const wchar_t* c);

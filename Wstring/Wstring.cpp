@@ -2,8 +2,6 @@
 #include "Helpers.h"
 #include "CustomAlloc.h"
 
-#include <Windows.h>
-
 static const size_t npos = (-1);
 
 Wstring::Wstring() {
@@ -13,7 +11,7 @@ Wstring::Wstring() {
 
 Wstring::Wstring(const wchar_t* data) {
     length = strLenW(data);
-    this->data = (wchar_t*)_malloc(sizeof(wchar_t)*this->length + 2);
+    this->data = (wchar_t*)_malloc(sizeof(wchar_t)*this->length + sizeof(wchar_t));
     if ((this->data != nullptr) && (data != nullptr)) {
         strCpyW(this->data, data);
     }
@@ -21,7 +19,7 @@ Wstring::Wstring(const wchar_t* data) {
 
 Wstring::Wstring(const Wstring& s) {
     length = s.length;
-    this->data = (wchar_t*)_malloc(sizeof(wchar_t)*length + 2);
+    this->data = (wchar_t*)_malloc(sizeof(wchar_t)*length + sizeof(wchar_t));
     if ((this->data != nullptr) && (s.data != nullptr)) {
         strCpyW(this->data, s.data);
     }
@@ -37,7 +35,7 @@ const Wstring& Wstring::operator= (const wchar_t* data) {
         _free(this->data);
         this->data = nullptr;
     }
-    this->data = (wchar_t*)_malloc(sizeof(wchar_t)*length + 2);
+    this->data = (wchar_t*)_malloc(sizeof(wchar_t)*length + sizeof(wchar_t));
     if ((this->data != nullptr) && (data != nullptr)) {
         strCpyW(this->data, data);
     }
@@ -50,7 +48,7 @@ const Wstring& Wstring::operator= (const Wstring& s) {
         _free(this->data);
         this->data = nullptr;
     }
-    this->data = (wchar_t*)_malloc(sizeof(wchar_t)*length + 2);
+    this->data = (wchar_t*)_malloc(sizeof(wchar_t)*length + sizeof(wchar_t));
     if ((this->data != nullptr) && (s.data != nullptr)) {
         strCpyW(this->data, s.data);
     }
@@ -60,7 +58,7 @@ const Wstring& Wstring::operator= (const Wstring& s) {
 Wstring Wstring::operator+ (const Wstring& s) {
     Wstring temp;
     temp.length = length + s.length;
-    temp.data = (wchar_t*)_malloc(sizeof(wchar_t)*temp.length + 2);
+    temp.data = (wchar_t*)_malloc(sizeof(wchar_t)*temp.length + sizeof(wchar_t));
     if ((temp.data != nullptr) && (data != nullptr) && (s.data != nullptr)) {
         strCpyW(temp.data, data);
         strCatW(temp.data, s.data);
@@ -71,7 +69,7 @@ Wstring Wstring::operator+ (const Wstring& s) {
 Wstring Wstring::operator+ (const wchar_t* d) {
     Wstring temp;
     temp.length = length + (int)strLenW(d);
-    temp.data = (wchar_t*)_malloc(sizeof(wchar_t)*temp.length + 2);
+    temp.data = (wchar_t*)_malloc(sizeof(wchar_t)*temp.length + sizeof(wchar_t));
     if ((temp.data != nullptr) && (data != nullptr) && (d != nullptr)) {
         strCpyW(temp.data, data);
         strCatW(temp.data, d);
