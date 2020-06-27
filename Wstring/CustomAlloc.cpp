@@ -1,4 +1,4 @@
-#include <stdint.h>
+ï»¿#include <stdint.h>
 #include "CustomAlloc.h"
 
 #define HEAP_SIZE 2*1024*1024
@@ -7,18 +7,18 @@
 #define BLOCK_SIZE_MASK 0xFFFFF000
 
 /*
-Â äàííîì ðåøåíèè âûäåëÿåòñÿ ñòàòè÷åñêè 2Ìá. ïàìÿòè è ðàáîòà èäåò ñ ýòèì áóôåðîì.
-Â äðóãèõ ðåàëèçàöèÿõ ìîæíî âûçâàòü heap_init(void* buf, size_t size) è ïåðåäàòü íóæíûé áóôåð è åãî ðàçìåð.
+Ð’ Ð´Ð°Ð½Ð½Ð¾Ð¼ Ñ€ÐµÑˆÐµÐ½Ð¸Ð¸ Ð²Ñ‹Ð´ÐµÐ»ÑÐµÑ‚ÑÑ ÑÑ‚Ð°Ñ‚Ð¸Ñ‡ÐµÑÐºÐ¸ 2ÐœÐ±. Ð¿Ð°Ð¼ÑÑ‚Ð¸ Ð¸ Ñ€Ð°Ð±Ð¾Ñ‚Ð° Ð¸Ð´ÐµÑ‚ Ñ ÑÑ‚Ð¸Ð¼ Ð±ÑƒÑ„ÐµÑ€Ð¾Ð¼.
+Ð’ Ð´Ñ€ÑƒÐ³Ð¸Ñ… Ñ€ÐµÐ°Ð»Ð¸Ð·Ð°Ñ†Ð¸ÑÑ… Ð¼Ð¾Ð¶Ð½Ð¾ Ð²Ñ‹Ð·Ð²Ð°Ñ‚ÑŒ heap_init(void* buf, size_t size) Ð¸ Ð¿ÐµÑ€ÐµÐ´Ð°Ñ‚ÑŒ Ð½ÑƒÐ¶Ð½Ñ‹Ð¹ Ð±ÑƒÑ„ÐµÑ€ Ð¸ ÐµÐ³Ð¾ Ñ€Ð°Ð·Ð¼ÐµÑ€.
 */
 
 static uint8_t memory[HEAP_SIZE];
 
 typedef struct segment {
 	int is_free;
-	int size; // â áëîêàõ
+	int size; // Ð² Ð±Ð»Ð¾ÐºÐ°Ñ…
 	struct segment* next;
 	struct segment* prev;
-} segment_t; // ñåãìåíò - êàê íåïðåðûâíûé êóñîê ïàìÿòè
+} segment_t; // ÑÐµÐ³Ð¼ÐµÐ½Ñ‚ - ÐºÐ°Ðº Ð½ÐµÐ¿Ñ€ÐµÑ€Ñ‹Ð²Ð½Ñ‹Ð¹ ÐºÑƒÑÐ¾Ðº Ð¿Ð°Ð¼ÑÑ‚Ð¸
 
 static segment_t* segments = nullptr;
 static segment_t* old_free_segment = nullptr;
@@ -33,8 +33,8 @@ void heap_init(void* buf, size_t size)
 	old_free_segment = 0;
 }
 
-// íàõîäèò ñåãìåíò ñâîáîäíîé ïàìÿòè, íî íèêàêèõ äåéñòâèé íàä íèì íå ïðîèçâîäèò
-// ïîèñê ïðîèçâîäèòñÿ îò ïåðåäàííîãî ýëåìåíòà è äî êîíöà ñïèñêà
+// Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ ÑÐµÐ³Ð¼ÐµÐ½Ñ‚ ÑÐ²Ð¾Ð±Ð¾Ð´Ð½Ð¾Ð¹ Ð¿Ð°Ð¼ÑÑ‚Ð¸, Ð½Ð¾ Ð½Ð¸ÐºÐ°ÐºÐ¸Ñ… Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ð¹ Ð½Ð°Ð´ Ð½Ð¸Ð¼ Ð½Ðµ Ð¿Ñ€Ð¾Ð¸Ð·Ð²Ð¾Ð´Ð¸Ñ‚
+// Ð¿Ð¾Ð¸ÑÐº Ð¿Ñ€Ð¾Ð¸Ð·Ð²Ð¾Ð´Ð¸Ñ‚ÑÑ Ð¾Ñ‚ Ð¿ÐµÑ€ÐµÐ´Ð°Ð½Ð½Ð¾Ð³Ð¾ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð° Ð¸ Ð´Ð¾ ÐºÐ¾Ð½Ñ†Ð° ÑÐ¿Ð¸ÑÐºÐ°
 static segment_t* search_free(segment_t* s, int size)
 {
 	while (s) {
@@ -44,15 +44,15 @@ static segment_t* search_free(segment_t* s, int size)
 	return s;
 }
 
-// ïåðåâîäèò ðàçìåð â áàéòàõ â êîëè÷åñòâî áëîêîâ
+// Ð¿ÐµÑ€ÐµÐ²Ð¾Ð´Ð¸Ñ‚ Ñ€Ð°Ð·Ð¼ÐµÑ€ Ð² Ð±Ð°Ð¹Ñ‚Ð°Ñ… Ð² ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð±Ð»Ð¾ÐºÐ¾Ð²
 static int get_num_block(size_t size)
 {
 	if (size % BLOCK_SIZE) size += BLOCK_SIZE;
 	return size / BLOCK_SIZE;
 }
 
-// îòðåçàåò îò óêàçàííîãî ñåãìåíòà, óêàçàííûé ðàçìåð
-// âîçâðàùàåò óêàçàòåëü íà íîâûé ñåãìåíò ïàìÿòè
+// Ð¾Ñ‚Ñ€ÐµÐ·Ð°ÐµÑ‚ Ð¾Ñ‚ ÑƒÐºÐ°Ð·Ð°Ð½Ð½Ð¾Ð³Ð¾ ÑÐµÐ³Ð¼ÐµÐ½Ñ‚Ð°, ÑƒÐºÐ°Ð·Ð°Ð½Ð½Ñ‹Ð¹ Ñ€Ð°Ð·Ð¼ÐµÑ€
+// Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ ÑƒÐºÐ°Ð·Ð°Ñ‚ÐµÐ»ÑŒ Ð½Ð° Ð½Ð¾Ð²Ñ‹Ð¹ ÑÐµÐ³Ð¼ÐµÐ½Ñ‚ Ð¿Ð°Ð¼ÑÑ‚Ð¸
 static segment_t* cut_segment(segment_t* s, int size)
 {
 	uintptr_t addr = (uintptr_t)s;
@@ -68,8 +68,8 @@ static segment_t* cut_segment(segment_t* s, int size)
 	return result;
 }
 
-// îáúåäèíÿåò äâà ñîñåäíèõ ñåãìåíòà â îäèí(ïåðâûé ïîãëîùàåò âòîðîé)
-// âîçâðàùàåò óêàçàòåëü íà íîâûé ñåãìåíò
+// Ð¾Ð±ÑŠÐµÐ´Ð¸Ð½ÑÐµÑ‚ Ð´Ð²Ð° ÑÐ¾ÑÐµÐ´Ð½Ð¸Ñ… ÑÐµÐ³Ð¼ÐµÐ½Ñ‚Ð° Ð² Ð¾Ð´Ð¸Ð½(Ð¿ÐµÑ€Ð²Ñ‹Ð¹ Ð¿Ð¾Ð³Ð»Ð¾Ñ‰Ð°ÐµÑ‚ Ð²Ñ‚Ð¾Ñ€Ð¾Ð¹)
+// Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ ÑƒÐºÐ°Ð·Ð°Ñ‚ÐµÐ»ÑŒ Ð½Ð° Ð½Ð¾Ð²Ñ‹Ð¹ ÑÐµÐ³Ð¼ÐµÐ½Ñ‚
 static segment_t* merge_segment(segment_t* s, segment_t* old)
 {
 	if (old_free_segment == old) old_free_segment = s;
@@ -101,7 +101,7 @@ static void* _memcpy(void* dest, const void* src, size_t bytes)
 }
 
 
-// âîçâðàùàåò 0 åñëè íåòó ïàìÿòè
+// Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ 0 ÐµÑÐ»Ð¸ Ð½ÐµÑ‚Ñƒ Ð¿Ð°Ð¼ÑÑ‚Ð¸
 void* _malloc(size_t size)
 {
 	
@@ -116,9 +116,9 @@ void* _malloc(size_t size)
 		return nullptr;
 	}
 
-	it->is_free = 0; // áðîíèðóåì ó÷àñòîê ïàìÿòè
+	it->is_free = 0; // Ð±Ñ€Ð¾Ð½Ð¸Ñ€ÑƒÐµÐ¼ ÑƒÑ‡Ð°ÑÑ‚Ð¾Ðº Ð¿Ð°Ð¼ÑÑ‚Ð¸
 
-	// îòðåæåì ëèøíþþ ïàìÿòü(íà êîíöå ìîæåò îñòàòüñÿ ìàëåíüêèé êóñî÷åê ïàìÿòè)
+	// Ð¾Ñ‚Ñ€ÐµÐ¶ÐµÐ¼ Ð»Ð¸ÑˆÐ½ÑŽÑŽ Ð¿Ð°Ð¼ÑÑ‚ÑŒ(Ð½Ð° ÐºÐ¾Ð½Ñ†Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¾ÑÑ‚Ð°Ñ‚ÑŒÑÑ Ð¼Ð°Ð»ÐµÐ½ÑŒÐºÐ¸Ð¹ ÐºÑƒÑÐ¾Ñ‡ÐµÐº Ð¿Ð°Ð¼ÑÑ‚Ð¸)
 	if (it->size > s + get_num_block(sizeof(segment_t))) {
 		segment_t* n = cut_segment(it, it->size - s);
 		n->is_free = 1;
@@ -150,8 +150,8 @@ void* _realloc(void* ptr, size_t size)
 
 	segment_t* s = ptr_to_segment(ptr);
 	int b = get_num_block(size + sizeof(segment_t));
-	if (s->size == b) return ptr; // íè÷åãî äåëàòü íå íàäî, ðàçìåð íå èçìåíèëñÿ
-	else if (s->size > b) return ptr; // FIXME: íàäî áû îñâîáîäèòü ÷àñòü ïàìÿòè
+	if (s->size == b) return ptr; // Ð½Ð¸Ñ‡ÐµÐ³Ð¾ Ð´ÐµÐ»Ð°Ñ‚ÑŒ Ð½Ðµ Ð½Ð°Ð´Ð¾, Ñ€Ð°Ð·Ð¼ÐµÑ€ Ð½Ðµ Ð¸Ð·Ð¼ÐµÐ½Ð¸Ð»ÑÑ
+	else if (s->size > b) return ptr; // FIXME: Ð½Ð°Ð´Ð¾ Ð±Ñ‹ Ð¾ÑÐ²Ð¾Ð±Ð¾Ð´Ð¸Ñ‚ÑŒ Ñ‡Ð°ÑÑ‚ÑŒ Ð¿Ð°Ð¼ÑÑ‚Ð¸
 	else { // if (s->size < b)
 		if (s->next && s->next->is_free && s->size + s->next->size >= b) {
 			merge_segment(s, s->next);
