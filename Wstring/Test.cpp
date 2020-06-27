@@ -62,7 +62,7 @@ int main()
    Wstring tested_str = L"Test1|Test2|Test3|Test4|Test5";
 
    size_t count_splited = 0;
-   tested_str.split((wchar_t*)L"|", test_split, 10, &count_splited);
+   tested_str.Split((wchar_t*)L"|", test_split, 10, &count_splited);
 
    //Вывод итоговой строки
    Wstring split_str_finall = L"Итоговая разбитая строка:"; 

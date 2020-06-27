@@ -203,11 +203,11 @@ const wchar_t* Wstring::c_wstr() const {
     return data;
 }
 
-size_t Wstring::lenght() const {
+size_t Wstring::LenStr() const {
     return (length - 1);
 }
 
-size_t Wstring::size() const {
+size_t Wstring::Size() const {
     return (length*(sizeof(wchar_t)));
 }
 
@@ -239,7 +239,7 @@ size_t Wstring::Find(const wchar_t* data, size_t pos) {
     return npos;
 }
 
-void Wstring::split(wchar_t* delim, Wstring* array_strings, size_t size_array_strings, size_t *count_splited) {
+void Wstring::Split(wchar_t* delim, Wstring* array_strings, size_t size_array_strings, size_t *count_splited) {
     
     size_t count = 0;
 

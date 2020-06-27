@@ -31,15 +31,15 @@ public:
     void PushBack(const wchar_t c);
     void PushBack(const wchar_t* c);
     void PushBack(const Wstring& s);
-    void split(wchar_t* delim, Wstring* array_strings, size_t size_array_strings, size_t* count_splited);
+    void Split(wchar_t* delim, Wstring* array_strings, size_t size_array_strings, size_t* count_splited);
     Wstring NumericToWstr(unsigned long num);
     
     void Resize(const size_t n);
     void Clear();
     bool IsEmpty() const;
 
-    size_t lenght() const;
-    size_t size() const;
+    size_t LenStr() const;
+    size_t Size() const;
 
     const wchar_t* c_wstr() const;
 
