@@ -1,4 +1,4 @@
-﻿#include "CustomAlloc.h"
+#include "CustomAlloc.h"
 
 #define HEAP_SIZE 2*1024*1024
 #define BLOCK_SIZE 0x1000
@@ -8,7 +8,7 @@ typedef unsigned int   uintptr_t;
 
 /*
 В данном решении выделяется статически 2Мб. памяти и работа идет с этим буфером.
-В других реализациях можно вызвать heap_init(void* buf, size_t size) и передать нужный буфер и его размер.
+В других реализациях можно вызвать HeapInit(void* buf, size_t size) и передать нужный буфер и его размер.
 */
 
 static uint8_t memory[HEAP_SIZE];
@@ -33,8 +33,10 @@ void HeapInit(void* buf, size_t size)
 	old_free_segment = 0;
 }
 
-// находит сегмент свободной памяти, но никаких действий над ним не производит
-// поиск производится от переданного элемента и до конца списка
+/*
+Находит сегмент свободной памяти, но никаких действий над ним не производит.
+Поиск производится от переданного элемента и до конца списка.
+*/ 
 static segment_t* SearchFree(segment_t* s, int size)
 {
 	while (s) {
@@ -44,15 +46,19 @@ static segment_t* SearchFree(segment_t* s, int size)
 	return s;
 }
 
-// переводит размер в байтах в количество блоков
+/*
+Переводит размер в байтах в количество блоков.
+*/
 static int GetNumBlock(size_t size)
 {
 	if (size % BLOCK_SIZE) size += BLOCK_SIZE;
 	return size / BLOCK_SIZE;
 }
 
-// отрезает от указанного сегмента, указанный размер
-// возвращает указатель на новый сегмент памяти
+/*
+Отрезает от указанного сегмента, указанный размер.
+Возвращает указатель на новый сегмент памяти.
+*/
 static segment_t* CutSegment(segment_t* s, int size)
 {
 	uintptr_t addr = (uintptr_t)s;
@@ -68,8 +74,10 @@ static segment_t* CutSegment(segment_t* s, int size)
 	return result;
 }
 
-// объединяет два соседних сегмента в один(первый поглощает второй)
-// возвращает указатель на новый сегмент
+/*
+Объединяет два соседних сегмента в один(первый поглощает второй).
+Возвращает указатель на новый сегмент.
+*/
 static segment_t* MergeSegment(segment_t* s, segment_t* old)
 {
 	if (old_free_segment == old) old_free_segment = s;
@@ -100,8 +108,9 @@ static void* _memcpy(void* dest, const void* src, size_t bytes)
 	return dest;
 }
 
-
-// возвращает nullptr если нету памяти
+/*
+Возвращает nullptr если нету памяти
+*/
 void* _malloc(size_t size)
 {
 	
@@ -116,9 +125,9 @@ void* _malloc(size_t size)
 		return nullptr;
 	}
 
-	it->is_free = 0; // бронируем участок памяти
+	it->is_free = 0; //Бронируем участок памяти
 
-	// отрежем лишнюю память(на конце может остаться маленький кусочек памяти)
+	//Отрежем лишнюю память
 	if (it->size > s + GetNumBlock(sizeof(segment_t))) {
 		segment_t* n = CutSegment(it, it->size - s);
 		n->is_free = 1;
@@ -150,9 +159,9 @@ void* _realloc(void* ptr, size_t size)
 
 	segment_t* s = PtrToSegment(ptr);
 	int b = GetNumBlock(size + sizeof(segment_t));
-	if (s->size == b) return ptr; // ничего делать не надо, размер не изменился
-	else if (s->size > b) return ptr; // FIXME: надо бы освободить часть памяти
-	else { // if (s->size < b)
+	if (s->size == b) return ptr;
+	else if (s->size > b) return ptr;
+	else {
 		if (s->next && s->next->is_free && s->size + s->next->size >= b) {
 			MergeSegment(s, s->next);
 			if (s->size > b + GetNumBlock(sizeof(segment_t))) {
