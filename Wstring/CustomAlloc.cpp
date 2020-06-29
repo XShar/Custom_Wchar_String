@@ -3,8 +3,8 @@
 #define HEAP_SIZE 2*1024*1024
 #define BLOCK_SIZE 0x1000
 
-typedef unsigned char  uint8_t;
-typedef unsigned int   uintptr_t;
+typedef unsigned char uint8_t;
+typedef unsigned int  uintptr_t;
 
 /*
 В данном решении выделяется статически 2Мб. памяти и работа идет с этим буфером.
